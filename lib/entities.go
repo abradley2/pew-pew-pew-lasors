@@ -11,18 +11,16 @@ type Entity interface {
 
 // Xwing : contains rebel scum
 type Xwing struct {
-	Sprite                 *ebiten.Image
-	Active                 bool
-	Xpos, Ypos, Xvel, Yvel float64
-	Width, Height          int
+	Sprite                                *ebiten.Image
+	Active                                bool
+	Xpos, Ypos, Xvel, Yvel, Width, Height float64
 }
 
 // Tie : fighter of choice for our brave troops
 type Tie struct {
-	Sprite                 *ebiten.Image
-	Active                 bool
-	Xpos, Ypos, Xvel, Yvel float64
-	Width, Height          int
+	Sprite                                *ebiten.Image
+	Active                                bool
+	Xpos, Ypos, Xvel, Yvel, Width, Height float64
 }
 
 // Update : update the xwing
@@ -32,6 +30,5 @@ func (x *Xwing) Update() {
 
 // Update : update the tie fighter
 func (t *Tie) Update() {
-	t.Xpos += 2
 	t.Ypos += 2
 }

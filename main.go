@@ -2,6 +2,8 @@ package main
 
 import (
 	"go-game/lib"
+	"math"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -11,10 +13,10 @@ type entityGroup interface {
 }
 
 // Xwings : contains a slice of 40 xwing entities
-type Xwings [40]*lib.Xwing
+type Xwings [50]*lib.Xwing
 
 // Ties : contains a slice of 40 tie entities
-type Ties [40]*lib.Tie
+type Ties [50]*lib.Tie
 
 var (
 	xwingSprite *ebiten.Image
@@ -47,6 +49,7 @@ func update(screen *ebiten.Image) error {
 	for i := 0; i < len(ties); i++ {
 		op.GeoM.Reset()
 		t := ties[i]
+		op.GeoM.Rotate(math.Pi)
 		op.GeoM.Translate(float64(t.Xpos), float64(t.Ypos))
 		screen.DrawImage(tieSprite, op)
 	}
@@ -62,7 +65,11 @@ func main() {
 		xwings[i] = new(lib.Xwing)
 	}
 	for i := range ties {
-		ties[i] = new(lib.Tie)
+		_, h := tieSprite.Size()
+		createTie := new(lib.Tie)
+		createTie.Xpos = rand.Float64() * float64(lib.GameWidth)
+		createTie.Ypos = 0 - float64(h)
+		ties[i] = createTie
 	}
 
 	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 1, "Hello world!")

@@ -25,13 +25,19 @@ var mu sync.Mutex
 var wd, _ = os.Getwd()
 
 func init() {
+	var wg sync.WaitGroup
+
+	wg.Add(len(imagePaths))
 
 	for _, imagePath := range imagePaths {
-		loadFile(imagePath, Images, &mu)
+		go loadFile(imagePath, Images, &mu, &wg)
 	}
+
+	wg.Wait()
 }
 
-func loadFile(imagePath string, images imageMap, mu *sync.Mutex) {
+func loadFile(imagePath string, images imageMap, mu *sync.Mutex, wg *sync.WaitGroup) {
+	defer wg.Done()
 	data, err := os.Open(filepath.Join(wd, imagePath))
 	if err != nil {
 		panic(fmt.Sprintf("issue opening image %s\n", imagePath))
