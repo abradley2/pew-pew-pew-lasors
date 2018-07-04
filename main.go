@@ -1,28 +1,68 @@
 package main
 
 import (
-	"fmt"
 	"go-game/lib"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
+
+type entityGroup interface {
+	updateEntity()
+}
+
+// Xwings : contains a slice of 40 xwing entities
+type Xwings [40]lib.Xwing
+
+// Ties : contains a slice of 40 tie entities
+type Ties [40]lib.Tie
 
 var (
-	xwings = make([]*lib.Entity, 40)
-	ties   = make([]*lib.Entity, 40)
+	xwings Xwings
+	ties   Ties
+	op     = &ebiten.DrawImageOptions{}
 )
 
-func update(screen *ebiten.Image) error {
-	for path := range lib.Images {
-		fmt.Printf("\n\nthe path is : %s\n\n", path)
+func (x Xwings) updateEntity() {
+	for _, x := range x {
+		x.Update()
 	}
-	ebitenutil.DebugPrint(screen, "Hello world! again")
+}
+
+func (t Ties) updateEntity() {
+	for _, t := range t {
+		t.Update()
+	}
+}
+
+func update(screen *ebiten.Image) error {
+	xwings.updateEntity()
+	ties.updateEntity()
+
+	if ebiten.IsRunningSlowly() {
+		return nil
+	}
+
+	// Draw each sprite.
+	// DrawImage can be called many many times, but in the implementation,
+	// the actual draw call to GPU is very few since these calls satisfy
+	// some conditions e.g. all the rendering sources and targets are same.
+	// For more detail, see:
+	// https://godoc.org/github.com/hajimehoshi/ebiten#Image.DrawImage
+	for i := 0; i < len(ties); i++ {
+		op.GeoM.Reset()
+		screen.DrawImage(lib.EbitenImage, op)
+	}
+
 	return nil
 }
 
 func main() {
-	// lets make some slices for storing entities
+	for _, xwing := range xwings {
+		xwing.Sprite = lib.Images["/assets/xwing-smol.png"]
+	}
+	for _, tie := range ties {
+		tie.Sprite = lib.Images["/assets/tie-smol.png"]
+	}
 
 	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 2, "Hello world!")
 }

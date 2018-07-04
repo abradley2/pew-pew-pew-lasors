@@ -2,11 +2,12 @@ package lib
 
 import (
 	"fmt"
-	"image"
 	"image/png"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/hajimehoshi/ebiten"
 )
 
 var imagePaths = []string{
@@ -16,13 +17,16 @@ var imagePaths = []string{
 	"/assets/xwing-smol.png",
 }
 
-type imageMap = map[string]image.Image
+type imageMap = map[string]ebiten.Image
 
 // Images : a map of image paths to their byte slices
-var Images = make(map[string]image.Image)
+var Images = make(map[string]ebiten.Image)
 
 var mu sync.Mutex
 var wd, _ = os.Getwd()
+
+// EbitenImage : the main stage
+var EbitenImage *ebiten.Image
 
 func init() {
 	fileLoadChannel := make(chan error)
@@ -46,8 +50,16 @@ func loadFile(imagePath string, images imageMap, mu *sync.Mutex, channel chan<- 
 		panic(fmt.Sprintf("issue decoding image %s\n", imagePath))
 	}
 
+	origEbitenImage, _ := ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+
+	w, h := origEbitenImage.Size()
+	EbitenImage, _ = ebiten.NewImage(w, h, ebiten.FilterNearest)
+
+	op := &ebiten.DrawImageOptions{}
+	EbitenImage.DrawImage(origEbitenImage, op)
+
 	mu.Lock()
-	images[imagePath] = img
+	images[imagePath] = *origEbitenImage
 	mu.Unlock()
 
 	channel <- err

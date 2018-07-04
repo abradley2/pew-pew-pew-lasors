@@ -1,30 +1,34 @@
 package lib
 
+import "github.com/hajimehoshi/ebiten"
+
 // Entity : basis wrapper for all different type of ships
 type Entity interface {
-	update()
+	Update()
 }
 
 // Xwing : contains rebel scum
 type Xwing struct {
-	active                 bool
-	sprite                 string
-	xPos, yPos, xVel, yVel float64
-	width, height          int
+	Sprite                 ebiten.Image
+	Active                 bool
+	Xpos, Ypos, Xvel, Yvel float64
+	Width, Height          int
 }
 
 // Tie : fighter of choice for our brave troops
 type Tie struct {
-	active                 bool
-	sprite                 string
-	xPos, yPos, xVel, yVel float64
-	width, height          int
+	Sprite                 ebiten.Image
+	Active                 bool
+	Xpos, Ypos, Xvel, Yvel float64
+	Width, Height          int
 }
 
-func (x Xwing) update() {
+// Update : update the xwing
+func (x Xwing) Update() {
 
 }
 
-func (t Tie) update() {
+// Update : update the tie fighter
+func (t Tie) Update() {
 
 }
