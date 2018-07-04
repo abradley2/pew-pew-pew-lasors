@@ -9,7 +9,7 @@ type Entity interface {
 
 // Xwing : contains rebel scum
 type Xwing struct {
-	Sprite                 ebiten.Image
+	Sprite                 *ebiten.Image
 	Active                 bool
 	Xpos, Ypos, Xvel, Yvel float64
 	Width, Height          int
@@ -17,7 +17,7 @@ type Xwing struct {
 
 // Tie : fighter of choice for our brave troops
 type Tie struct {
-	Sprite                 ebiten.Image
+	Sprite                 *ebiten.Image
 	Active                 bool
 	Xpos, Ypos, Xvel, Yvel float64
 	Width, Height          int
