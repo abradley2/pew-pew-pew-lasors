@@ -2,7 +2,7 @@ package lib
 
 const (
 	// GameHeight height of the game
-	GameHeight = 400
+	GameHeight = 800
 	// GameWidth width of the game
-	GameWidth = 600
+	GameWidth = 1400
 )

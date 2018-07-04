@@ -1,8 +1,6 @@
 package lib
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -28,13 +26,12 @@ type Tie struct {
 }
 
 // Update : update the xwing
-func (x Xwing) Update() {
+func (x *Xwing) Update() {
 
 }
 
 // Update : update the tie fighter
-func (t Tie) Update() {
-	fmt.Println("updating tie")
-	t.Xpos++
-	t.Ypos--
+func (t *Tie) Update() {
+	t.Xpos += 2
+	t.Ypos += 2
 }
