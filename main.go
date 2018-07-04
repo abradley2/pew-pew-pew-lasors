@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go-game/lib"
 
 	"github.com/hajimehoshi/ebiten"
@@ -19,8 +20,8 @@ type Ties [40]lib.Tie
 var (
 	xwingSprite *ebiten.Image
 	tieSprite   *ebiten.Image
-	xwings      Xwings
-	ties        Ties
+	xwings      = []*lib.Xwing{new(lib.Xwing)}
+	ties        = []*lib.Tie{new(lib.Tie)}
 	op          = &ebiten.DrawImageOptions{}
 )
 
@@ -37,16 +38,19 @@ func (t Ties) updateEntity() {
 }
 
 func update(screen *ebiten.Image) error {
-	xwings.updateEntity()
-	ties.updateEntity()
 
 	if ebiten.IsRunningSlowly() {
 		return nil
 	}
 
 	for i := 0; i < len(ties); i++ {
-		screen.DrawImage(xwingSprite, op)
 		op.GeoM.Reset()
+		t := ties[i]
+		t.Xpos++
+		t.Ypos++
+		op.GeoM.Translate(float64(t.Xpos), float64(t.Ypos))
+		fmt.Println(float64(t.Ypos))
+		screen.DrawImage(tieSprite, op)
 	}
 
 	return nil

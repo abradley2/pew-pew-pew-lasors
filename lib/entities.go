@@ -1,6 +1,10 @@
 package lib
 
-import "github.com/hajimehoshi/ebiten"
+import (
+	"fmt"
+
+	"github.com/hajimehoshi/ebiten"
+)
 
 // Entity : basis wrapper for all different type of ships
 type Entity interface {
@@ -30,5 +34,7 @@ func (x Xwing) Update() {
 
 // Update : update the tie fighter
 func (t Tie) Update() {
-
+	fmt.Println("updating tie")
+	t.Xpos++
+	t.Ypos--
 }
