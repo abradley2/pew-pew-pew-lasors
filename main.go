@@ -3,7 +3,6 @@ package main
 import (
 	"go-game/lib"
 	"math"
-	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -47,11 +46,25 @@ func update(screen *ebiten.Image) error {
 	}
 
 	for i := 0; i < len(ties); i++ {
-		op.GeoM.Reset()
 		t := ties[i]
+		if t.Active != true {
+			continue
+		}
+		op.GeoM.Reset()
 		op.GeoM.Rotate(math.Pi)
-		op.GeoM.Translate(float64(t.Xpos), float64(t.Ypos))
+		op.GeoM.Translate(t.Xpos, t.Ypos)
 		screen.DrawImage(tieSprite, op)
+	}
+
+	for i := 0; i < len(xwings); i++ {
+		x := xwings[i]
+		if x.Active != true {
+			continue
+		}
+		op.GeoM.Reset()
+		op.GeoM.Rotate(0)
+		op.GeoM.Translate(x.Xpos, x.Ypos)
+		screen.DrawImage(xwingSprite, op)
 	}
 
 	return nil
@@ -62,15 +75,17 @@ func main() {
 	tieSprite, _ = ebiten.NewImageFromImage(*lib.Images["/assets/tie-smol.png"], ebiten.FilterDefault)
 
 	for i := range xwings {
-		xwings[i] = new(lib.Xwing)
+		createXwing := new(lib.Xwing)
+		createXwing.Active = false
+		createXwing.Sprite = xwingSprite
+		xwings[i] = createXwing
 	}
 	for i := range ties {
-		_, h := tieSprite.Size()
 		createTie := new(lib.Tie)
-		createTie.Xpos = rand.Float64() * float64(lib.GameWidth)
-		createTie.Ypos = 0 - float64(h)
+		createTie.Active = false
+		createTie.Sprite = tieSprite
 		ties[i] = createTie
 	}
 
-	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 1, "Hello world!")
+	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 0.5, "Hello world!")
 }
