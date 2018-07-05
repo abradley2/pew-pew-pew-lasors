@@ -75,15 +75,21 @@ func main() {
 	tieSprite, _ = ebiten.NewImageFromImage(*lib.Images["/assets/tie-smol.png"], ebiten.FilterDefault)
 
 	for i := range xwings {
+		w, h := xwingSprite.Size()
 		createXwing := new(lib.Xwing)
 		createXwing.Active = false
 		createXwing.Sprite = xwingSprite
+		createXwing.Width = float64(w)
+		createXwing.Height = float64(h)
 		xwings[i] = createXwing
 	}
 	for i := range ties {
+		w, h := tieSprite.Size()
 		createTie := new(lib.Tie)
 		createTie.Active = false
 		createTie.Sprite = tieSprite
+		createTie.Width = float64(w)
+		createTie.Height = float64(h)
 		ties[i] = createTie
 	}
 

@@ -12,6 +12,7 @@ type Entity interface {
 	Update()
 	Spawn()
 	Remove()
+	GetCoords() (float64, float64, float64, float64)
 }
 
 // Xwing : contains rebel scum
@@ -27,6 +28,13 @@ type Xwing struct {
 type Tie struct {
 	SpawnQueued                           bool
 	ShotQueued                            bool
+	Sprite                                *ebiten.Image
+	Active                                bool
+	Xpos, Ypos, Xvel, Yvel, Width, Height float64
+}
+
+// Missile : a missile shot by either a tie or an xwing
+type Missile struct {
 	Sprite                                *ebiten.Image
 	Active                                bool
 	Xpos, Ypos, Xvel, Yvel, Width, Height float64
@@ -56,6 +64,7 @@ func (t *Tie) Update() {
 	}
 	if t.Ypos > float64(GameHeight)+100 {
 		t.Remove()
+		return
 	}
 	t.Ypos += 10
 }
@@ -72,6 +81,7 @@ func (x *Xwing) Update() {
 	}
 	if x.Ypos < -100 {
 		x.Remove()
+		return
 	}
 	x.Ypos -= 10
 }
@@ -92,4 +102,14 @@ func (x *Xwing) Spawn() {
 	x.Active = true
 	x.Xpos = (rand.Float64() * float64(GameWidth-w)) + float64(w)
 	x.Ypos = float64(GameHeight + h)
+}
+
+// GetCoords : get x, y, w, h for a tie
+func (t *Tie) GetCoords() (float64, float64, float64, float64) {
+	return t.Xpos, t.Ypos, t.Width, t.Height
+}
+
+// GetCoords : get x, y, w, h for an xwing
+func (x *Xwing) GetCoords() (float64, float64, float64, float64) {
+	return x.Xpos, x.Ypos, x.Width, x.Height
 }
