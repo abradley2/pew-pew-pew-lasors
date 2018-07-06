@@ -64,6 +64,12 @@ func update(screen *ebiten.Image) error {
 	for i := 0; i < len(ties); i++ {
 		t := ties[i]
 		if t.Active != true {
+			if t.Exploding {
+				op.GeoM.Reset()
+				op.GeoM.Rotate(math.Pi)
+				op.GeoM.Translate(t.Xpos, t.Ypos)
+				screen.DrawImage(explosionSprites[t.ExplosionFrame], op)
+			}
 			continue
 		}
 		op.GeoM.Reset()
@@ -105,6 +111,7 @@ func update(screen *ebiten.Image) error {
 			for _, t := range ties {
 				if t.Active && checkCollision(t, m) {
 					t.Remove()
+					t.Explode()
 					m.Remove()
 				}
 			}
@@ -115,6 +122,7 @@ func update(screen *ebiten.Image) error {
 			for _, x := range xwings {
 				if x.Active && checkCollision(x, m) {
 					x.Remove()
+					x.Explode()
 					m.Remove()
 				}
 			}
@@ -129,17 +137,7 @@ func checkCollision(entity1 lib.Entity, entity2 lib.Entity) bool {
 	x1, y1, w1, h1, _ := entity1.GetCoords()
 	x2, y2, w2, h2, _ := entity2.GetCoords()
 	var collision bool
-	/*
-		var rect1 = {x: 5, y: 5, width: 50, height: 50}
-		var rect2 = {x: 20, y: 10, width: 10, height: 10}
 
-		if (rect1.x < rect2.x + rect2.width &&
-		   rect1.x + rect1.width > rect2.x &&
-		   rect1.y < rect2.y + rect2.height &&
-		   rect1.height + rect1.y > rect2.y) {
-		    // collision detected!
-		}
-	*/
 	if x1 < x2+(w2) &&
 		x1+(w1) > x2 &&
 		y1 < y2+(h2) &&

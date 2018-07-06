@@ -18,6 +18,8 @@ type Entity interface {
 
 // Xwing : contains rebel scum
 type Xwing struct {
+	Exploding                             bool
+	ExplosionFrame                        int
 	Team                                  string
 	ShotRequested                         bool
 	SpawnQueued                           bool
@@ -30,6 +32,8 @@ type Xwing struct {
 
 // Tie : fighter of choice for our brave troops
 type Tie struct {
+	Exploding                             bool
+	ExplosionFrame                        int
 	Team                                  string
 	ShotRequested                         bool
 	SpawnQueued                           bool
@@ -171,6 +175,30 @@ func (x *Xwing) GetCoords() (float64, float64, float64, float64, float64) {
 // GetCoords : get x, y, w, h for a missile
 func (m *Missile) GetCoords() (float64, float64, float64, float64, float64) {
 	return m.Xpos, m.Ypos, m.Width, m.Height, 1
+}
+
+// Explode : blow up an xwing
+func (x *Xwing) Explode() {
+	if x.ExplosionFrame == 25 {
+		x.Exploding = false
+		x.ExplosionFrame = -1
+		return
+	}
+	x.Exploding = true
+	x.ExplosionFrame++
+	time.AfterFunc(time.Duration(16)*time.Millisecond, x.Explode)
+}
+
+// Explode : blow up a tiefighter
+func (t *Tie) Explode() {
+	if t.ExplosionFrame > 20 {
+		t.Exploding = false
+		t.ExplosionFrame = -1
+		return
+	}
+	t.Exploding = true
+	t.ExplosionFrame++
+	time.AfterFunc(time.Duration(100)*time.Millisecond, t.Explode)
 }
 
 func getPath(xStart float64, yStart float64, direction int) []vg.Point {
