@@ -53,13 +53,13 @@ func (m Missiles) updateEntity() {
 }
 
 func update(screen *ebiten.Image) error {
-	if ebiten.IsRunningSlowly() {
-		return nil
-	}
-
 	xwings.updateEntity()
 	ties.updateEntity()
 	missiles.updateEntity()
+
+	if ebiten.IsRunningSlowly() {
+		return nil
+	}
 
 	for i := 0; i < len(ties); i++ {
 		t := ties[i]
@@ -126,8 +126,10 @@ func update(screen *ebiten.Image) error {
 
 		//
 		if m.Team == "xwing" {
+			var hit bool
 			for _, t := range ties {
-				if t.Active && checkCollision(t, m) {
+				if !hit && t.Active && checkCollision(t, m) {
+					hit = true
 					t.Remove()
 					t.Explode()
 					m.Remove()
@@ -137,8 +139,10 @@ func update(screen *ebiten.Image) error {
 		}
 
 		if m.Team == "tie" {
+			var hit bool
 			for _, x := range xwings {
-				if x.Active && checkCollision(x, m) {
+				if !hit && x.Active && checkCollision(x, m) {
+					hit = true
 					x.Remove()
 					x.Explode()
 					m.Remove()
@@ -243,5 +247,5 @@ func main() {
 		}
 	}
 
-	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 0.5, "Hello world!")
+	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 0.25, "Pew Pew Pew")
 }
