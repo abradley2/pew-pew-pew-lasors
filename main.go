@@ -2,8 +2,10 @@ package main
 
 import (
 	"go-game/lib"
+	"image"
 	"math"
 
+	"github.com/disintegration/gift"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -21,6 +23,7 @@ type Ties [80]*lib.Tie
 type Missiles [400]*lib.Missile
 
 var (
+	explosionSprites [25]*ebiten.Image
 	redLazorSprite   *ebiten.Image
 	greenLazorSprite *ebiten.Image
 	xwingSprite      *ebiten.Image
@@ -68,7 +71,7 @@ func update(screen *ebiten.Image) error {
 		op.GeoM.Translate(t.Xpos, t.Ypos)
 		screen.DrawImage(tieSprite, op)
 		if t.ShotRequested {
-			fireZeMissiles("tie", t.Xpos, t.Ypos, 1)
+			fireZeMissiles("tie", t.Xpos-(t.Width/2), t.Ypos, 1)
 			t.ShotRequested = false
 		}
 	}
@@ -83,7 +86,7 @@ func update(screen *ebiten.Image) error {
 		op.GeoM.Translate(x.Xpos, x.Ypos)
 		screen.DrawImage(xwingSprite, op)
 		if x.ShotRequested {
-			fireZeMissiles("xwing", x.Xpos, x.Ypos, -1)
+			fireZeMissiles("xwing", x.Xpos+(x.Width/2), x.Ypos, -1)
 			x.ShotRequested = false
 		}
 	}
@@ -96,19 +99,55 @@ func update(screen *ebiten.Image) error {
 		op.GeoM.Reset()
 		op.GeoM.Rotate(0)
 		op.GeoM.Translate(m.Xpos, m.Ypos)
-		var sprite *ebiten.Image
 
-		switch m.Team {
-		case "xwing":
-			sprite = redLazorSprite
-		case "tie":
-			sprite = greenLazorSprite
+		//
+		if m.Team == "xwing" {
+			for _, t := range ties {
+				if t.Active && checkCollision(t, m) {
+					t.Remove()
+					m.Remove()
+				}
+			}
+			screen.DrawImage(redLazorSprite, op)
 		}
 
-		screen.DrawImage(sprite, op)
+		if m.Team == "tie" {
+			for _, x := range xwings {
+				if x.Active && checkCollision(x, m) {
+					x.Remove()
+					m.Remove()
+				}
+			}
+			screen.DrawImage(greenLazorSprite, op)
+		}
 	}
 
 	return nil
+}
+
+func checkCollision(entity1 lib.Entity, entity2 lib.Entity) bool {
+	x1, y1, w1, h1, _ := entity1.GetCoords()
+	x2, y2, w2, h2, _ := entity2.GetCoords()
+	var collision bool
+	/*
+		var rect1 = {x: 5, y: 5, width: 50, height: 50}
+		var rect2 = {x: 20, y: 10, width: 10, height: 10}
+
+		if (rect1.x < rect2.x + rect2.width &&
+		   rect1.x + rect1.width > rect2.x &&
+		   rect1.y < rect2.y + rect2.height &&
+		   rect1.height + rect1.y > rect2.y) {
+		    // collision detected!
+		}
+	*/
+	if x1 < x2+(w2) &&
+		x1+(w1) > x2 &&
+		y1 < y2+(h2) &&
+		(h1)+y1 > y2 {
+		collision = true
+	}
+
+	return collision
 }
 
 func fireZeMissiles(team string, xPos float64, yPos float64, yVel float64) {
@@ -129,6 +168,8 @@ func main() {
 	greenLazorSprite, _ = ebiten.NewImageFromImage(*lib.Images["/assets/lazor-green.png"], ebiten.FilterDefault)
 	xwingSprite, _ = ebiten.NewImageFromImage(*lib.Images["/assets/xwing-smol.png"], ebiten.FilterDefault)
 	tieSprite, _ = ebiten.NewImageFromImage(*lib.Images["/assets/tie-smol.png"], ebiten.FilterDefault)
+	explosionImg := *lib.Images["/assets/explosion.png"]
+	explosionSpriteSheet, _ := ebiten.NewImageFromImage(explosionImg, ebiten.FilterDefault)
 
 	for i := range xwings {
 		w, h := xwingSprite.Size()
@@ -149,8 +190,36 @@ func main() {
 		ties[i] = createTie
 	}
 	for i := range missiles {
+		w, h := redLazorSprite.Size()
 		createMissile := new(lib.Missile)
+		createMissile.Width = float64(w)
+		createMissile.Height = float64(h)
 		missiles[i] = createMissile
+	}
+
+	// create the explosion sprite sheet
+	// seperate this out into a convenience function later
+	w, h := explosionSpriteSheet.Size()
+
+	heightCut := h / 5
+	widthCut := w / 5
+	row := 0
+	column := 0
+
+	for i := 0; i < len(explosionSprites); i++ {
+		genImg := image.NewRGBA(image.Rect(0, 0, widthCut, heightCut))
+		rect := image.Rect(column*widthCut, row*heightCut, column*widthCut+widthCut, row*heightCut+heightCut)
+		filter := gift.New(gift.Crop(rect))
+
+		filter.Draw(genImg, explosionImg)
+
+		resultImg, _ := ebiten.NewImageFromImage(genImg, ebiten.FilterDefault)
+		explosionSprites[i] = resultImg
+		column++
+		if column == 6 {
+			column = 0
+			row++
+		}
 	}
 
 	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 0.5, "Hello world!")

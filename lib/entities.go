@@ -12,9 +12,8 @@ import (
 // Entity : basis wrapper for all different type of ships
 type Entity interface {
 	Update()
-	Spawn()
 	Remove()
-	GetCoords() (float64, float64, float64, float64)
+	GetCoords() (float64, float64, float64, float64, float64)
 }
 
 // Xwing : contains rebel scum
@@ -160,13 +159,18 @@ func (x *Xwing) RequestShot() {
 }
 
 // GetCoords : get x, y, w, h for a tie
-func (t *Tie) GetCoords() (float64, float64, float64, float64) {
-	return t.Xpos, t.Ypos, t.Width, t.Height
+func (t *Tie) GetCoords() (float64, float64, float64, float64, float64) {
+	return t.Xpos - t.Width, t.Ypos - t.Height, t.Width, t.Height, -1
 }
 
 // GetCoords : get x, y, w, h for an xwing
-func (x *Xwing) GetCoords() (float64, float64, float64, float64) {
-	return x.Xpos, x.Ypos, x.Width, x.Height
+func (x *Xwing) GetCoords() (float64, float64, float64, float64, float64) {
+	return x.Xpos, x.Ypos, x.Width, x.Height, 1
+}
+
+// GetCoords : get x, y, w, h for a missile
+func (m *Missile) GetCoords() (float64, float64, float64, float64, float64) {
+	return m.Xpos, m.Ypos, m.Width, m.Height, 1
 }
 
 func getPath(xStart float64, yStart float64, direction int) []vg.Point {

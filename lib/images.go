@@ -14,6 +14,7 @@ var imagePaths = []string{
 	"/assets/lazor-red.png",
 	"/assets/tie-smol.png",
 	"/assets/xwing-smol.png",
+	"/assets/explosion.png",
 }
 
 type imageMap = map[string]*image.Image
