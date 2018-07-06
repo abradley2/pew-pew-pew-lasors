@@ -23,7 +23,7 @@ type Ties [80]*lib.Tie
 type Missiles [400]*lib.Missile
 
 var (
-	explosionSprites [25]*ebiten.Image
+	explosionSprites [50]*ebiten.Image
 	redLazorSprite   *ebiten.Image
 	greenLazorSprite *ebiten.Image
 	xwingSprite      *ebiten.Image
@@ -65,10 +65,16 @@ func update(screen *ebiten.Image) error {
 		t := ties[i]
 		if t.Active != true {
 			if t.Exploding {
+				if t.ExplosionFrame == len(explosionSprites) {
+					t.Exploding = false
+					t.ExplosionFrame = 0
+					continue
+				}
 				op.GeoM.Reset()
 				op.GeoM.Rotate(math.Pi)
 				op.GeoM.Translate(t.Xpos, t.Ypos)
 				screen.DrawImage(explosionSprites[t.ExplosionFrame], op)
+				t.ExplosionFrame++
 			}
 			continue
 		}
@@ -85,6 +91,18 @@ func update(screen *ebiten.Image) error {
 	for i := 0; i < len(xwings); i++ {
 		x := xwings[i]
 		if x.Active != true {
+			if x.Exploding {
+				if x.ExplosionFrame == len(explosionSprites) {
+					x.Exploding = false
+					x.ExplosionFrame = 0
+					continue
+				}
+				op.GeoM.Reset()
+				op.GeoM.Rotate(0)
+				op.GeoM.Translate(x.Xpos, x.Ypos)
+				screen.DrawImage(explosionSprites[x.ExplosionFrame], op)
+				x.ExplosionFrame++
+			}
 			continue
 		}
 		op.GeoM.Reset()
@@ -204,15 +222,20 @@ func main() {
 	row := 0
 	column := 0
 
-	for i := 0; i < len(explosionSprites); i++ {
+	for i := 0; i < len(explosionSprites); i += 2 {
 		genImg := image.NewRGBA(image.Rect(0, 0, widthCut, heightCut))
 		rect := image.Rect(column*widthCut, row*heightCut, column*widthCut+widthCut, row*heightCut+heightCut)
 		filter := gift.New(gift.Crop(rect))
 
 		filter.Draw(genImg, explosionImg)
 
-		resultImg, _ := ebiten.NewImageFromImage(genImg, ebiten.FilterDefault)
+		bigImg := image.NewRGBA(image.Rect(0, 0, 100, 100))
+		bigFilter := gift.New(gift.Resize(100, 100, gift.LanczosResampling))
+		bigFilter.Draw(bigImg, genImg)
+
+		resultImg, _ := ebiten.NewImageFromImage(bigImg, ebiten.FilterDefault)
 		explosionSprites[i] = resultImg
+		explosionSprites[i+1] = resultImg
 		column++
 		if column == 6 {
 			column = 0

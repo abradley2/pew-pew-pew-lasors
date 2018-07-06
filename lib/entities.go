@@ -179,26 +179,14 @@ func (m *Missile) GetCoords() (float64, float64, float64, float64, float64) {
 
 // Explode : blow up an xwing
 func (x *Xwing) Explode() {
-	if x.ExplosionFrame == 25 {
-		x.Exploding = false
-		x.ExplosionFrame = -1
-		return
-	}
 	x.Exploding = true
-	x.ExplosionFrame++
-	time.AfterFunc(time.Duration(16)*time.Millisecond, x.Explode)
+	x.ExplosionFrame = 0
 }
 
 // Explode : blow up a tiefighter
 func (t *Tie) Explode() {
-	if t.ExplosionFrame > 20 {
-		t.Exploding = false
-		t.ExplosionFrame = -1
-		return
-	}
 	t.Exploding = true
-	t.ExplosionFrame++
-	time.AfterFunc(time.Duration(100)*time.Millisecond, t.Explode)
+	t.ExplosionFrame = 0
 }
 
 func getPath(xStart float64, yStart float64, direction int) []vg.Point {
