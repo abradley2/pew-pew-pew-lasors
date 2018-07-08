@@ -28,6 +28,7 @@ var (
 	greenLazorSprite *ebiten.Image
 	xwingSprite      *ebiten.Image
 	tieSprite        *ebiten.Image
+	bgImg            *ebiten.Image
 	xwings           Xwings
 	ties             Ties
 	missiles         Missiles
@@ -60,6 +61,9 @@ func update(screen *ebiten.Image) error {
 	if ebiten.IsRunningSlowly() {
 		return nil
 	}
+
+	op.GeoM.Reset()
+	screen.DrawImage(bgImg, op)
 
 	for i := 0; i < len(ties); i++ {
 		t := ties[i]
@@ -246,6 +250,11 @@ func main() {
 			row++
 		}
 	}
+
+	bg := image.NewRGBA(image.Rect(0, 0, lib.GameWidth, lib.GameHeight))
+	bgFilter := gift.New(gift.Resize(lib.GameWidth, lib.GameHeight, gift.LanczosResampling))
+	bgFilter.Draw(bg, *lib.Images["/assets/space-bg-1.png"])
+	bgImg, _ = ebiten.NewImageFromImage(bg, ebiten.FilterDefault)
 
 	ebiten.Run(update, lib.GameWidth, lib.GameHeight, 0.25, "Pew Pew Pew")
 }
