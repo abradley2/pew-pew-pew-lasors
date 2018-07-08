@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go-game/lib"
 	"image"
 	"math"
@@ -14,13 +15,13 @@ type entityGroup interface {
 }
 
 // Xwings : contains a slice of 40 xwing entities
-type Xwings [80]*lib.Xwing
+type Xwings [100]*lib.Xwing
 
 // Ties : contains a slice of 40 tie entities
-type Ties [80]*lib.Tie
+type Ties [100]*lib.Tie
 
 // Missiles ; contains a slice of 200 missile entities
-type Missiles [400]*lib.Missile
+type Missiles [1000]*lib.Missile
 
 var (
 	explosionSprites [50]*ebiten.Image
@@ -57,6 +58,8 @@ func update(screen *ebiten.Image) error {
 	xwings.updateEntity()
 	ties.updateEntity()
 	missiles.updateEntity()
+
+	fmt.Println(ebiten.CurrentFPS())
 
 	if ebiten.IsRunningSlowly() {
 		return nil
