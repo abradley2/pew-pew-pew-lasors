@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"go-game/lib"
 	"image"
 	"math"
+
+	"github.com/abradley2/pew-pew-pew-lasors/lib"
 
 	"github.com/disintegration/gift"
 	"github.com/hajimehoshi/ebiten"

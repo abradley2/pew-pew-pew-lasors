@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
-	"gonum.org/v1/plot/tools/bezier"
-	"gonum.org/v1/plot/vg"
 )
 
 // Entity : basis wrapper for all different type of ships
@@ -27,7 +25,6 @@ type Xwing struct {
 	Sprite                                *ebiten.Image
 	Active                                bool
 	Xpos, Ypos, Xvel, Yvel, Width, Height float64
-	Path                                  []vg.Point
 }
 
 // Tie : fighter of choice for our brave troops
@@ -41,7 +38,6 @@ type Tie struct {
 	Sprite                                *ebiten.Image
 	Active                                bool
 	Xpos, Ypos, Xvel, Yvel, Width, Height float64
-	Path                                  []vg.Point
 }
 
 // Missile : a missile shot by either a tie or an xwing
@@ -187,28 +183,4 @@ func (x *Xwing) Explode() {
 func (t *Tie) Explode() {
 	t.Exploding = true
 	t.ExplosionFrame = 0
-}
-
-func getPath(xStart float64, yStart float64, direction int) []vg.Point {
-	controlPoints := make([]vg.Point, 3)
-	controlPoints[0] = vg.Point{X: vg.Length(xStart), Y: vg.Length(yStart)}
-	for i := 1; i < len(controlPoints); i++ {
-		prevPoint := controlPoints[i-1]
-		rf := rand.Float64()
-		var dir float64 = -1
-		if (rand.Int())%2 == 0 {
-			dir = 1
-		}
-		xchg := 300 * rf * dir
-		ychg := GameHeight / 3
-
-		controlPoints[i] = vg.Point{X: prevPoint.X + vg.Length(xchg), Y: prevPoint.Y + vg.Length(ychg*direction)}
-	}
-
-	curve := bezier.New(controlPoints[0], controlPoints[1], controlPoints[2])
-	points := make([]vg.Point, GameHeight)
-
-	curvePath := curve.Curve(points)
-
-	return curvePath
 }
